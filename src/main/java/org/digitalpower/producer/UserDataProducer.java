@@ -30,20 +30,18 @@ public class UserDataProducer {
 
     public User generateUser() {
         User user = new User();
-        user.setUserId(faker.idNumber().valid());
-        user.setUserName(faker.name().username());
-        user.setEmail(faker.internet().emailAddress());
-        user.setCity(faker.address().city());
-        user.setState(faker.address().state());
-        user.setCountry(faker.address().country());
-        user.setAge(faker.number().numberBetween(18, 65));
+        user.userId = faker.idNumber().valid();
+        user.userName = faker.name().username();
+        user.email = faker.internet().emailAddress();
+        user.city = faker.address().city();
+        user.state = faker.address().state();
+        user.country = faker.address().country();
+        user.age = faker.number().numberBetween(18, 65);
         return user;
     }
 
     public void sendToKafka(User user) {
-        producer.send(new ProducerRecord<>(TOPIC, user.getUserId(), user));
+        producer.send(new ProducerRecord<>(TOPIC, user.userId, user));
         producer.flush();
     }
-
-
 }

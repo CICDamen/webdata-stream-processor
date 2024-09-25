@@ -30,20 +30,18 @@ public class WebDataProducer {
 
     public WebData generateWebData() {
         WebData webData = new WebData();
-        webData.setUserId(faker.idNumber().valid());
-        webData.setClicks(faker.number().numberBetween(1, 10));
-        webData.setImpressions(faker.number().numberBetween(1, 10));
-        webData.setConversions(faker.number().numberBetween(1, 10));
-        webData.setAddToCarts(faker.number().numberBetween(1, 10));
-        webData.setRevenue(faker.number().numberBetween(1, 100));
+        webData.timestamp = System.currentTimeMillis();
+        webData.userId = faker.idNumber().valid();
+        webData.clicks = faker.number().numberBetween(1, 10);
+        webData.impressions = faker.number().numberBetween(1, 10);
+        webData.conversions = faker.number().numberBetween(1, 10);
+        webData.addToCarts = faker.number().numberBetween(1, 10);
+        webData.revenue = faker.number().numberBetween(1, 100);
         return webData;
     }
 
     public void sendToKafka(WebData webData) {
-        producer.send(new ProducerRecord<>(TOPIC, webData.getUserId(), webData));
+        producer.send(new ProducerRecord<>(TOPIC, webData.userId, webData));
         producer.flush();
     }
-
 }
-
-
