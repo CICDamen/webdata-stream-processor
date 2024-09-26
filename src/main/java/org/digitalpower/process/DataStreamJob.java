@@ -12,35 +12,33 @@ import org.digitalpower.model.WebData;
 public class DataStreamJob {
 
     public static void main(String[] args) throws Exception {
-        // Sets up the execution environment, which is the main entry point
-        // to building Flink applications.
-        // JobManager host and port
-        String jobManagerHost = "localhost";
-        int jobManagerPort = 8081;
 
         // Create a configuration object
         Configuration config = new Configuration();
+        String BOOTSTRAP_SERVER = "127.0.0.1:29092";
 
-        try (StreamExecutionEnvironment env = StreamExecutionEnvironment.createRemoteEnvironment(jobManagerHost, jobManagerPort, config)) {
+        // Setup local execution environment with Web UI
+        try (StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(config)) {
 
-            // Create a Kafka source
-            KafkaSource<WebData> source = KafkaSource.<WebData>builder()
-					.setBootstrapServers("localhost:29092")
-                    .setTopics("users")
-					.setGroupId("test-group")
-					.setStartingOffsets(OffsetsInitializer.earliest())
+            // Create the Kafka source
+            KafkaSource<WebData> webDataSource = KafkaSource.<WebData>builder()
+                    .setBootstrapServers(BOOTSTRAP_SERVER)
+                    .setTopics("web-data")
+                    .setGroupId("test-group")
+                    .setStartingOffsets(OffsetsInitializer.earliest())
                     .setValueOnlyDeserializer(new WebDataDeserializerSchema())
                     .build();
 
-			// Create a data stream from the source
-			DataStream<WebData> stream = env.fromSource(source, WatermarkStrategy.noWatermarks(), "Kafka Source");
+
+            // Create the data streams from the Kafka sources
+            DataStream<WebData> webDataStream = env.fromSource(webDataSource, WatermarkStrategy.noWatermarks(), "WebData source");
 
             // Print the stream to the console
-            stream.print();
+            webDataStream.print();
 
             // Execute the job
-            env.execute("Flink Java API Skeleton");
-        }
+            env.execute("Process user and web data");
 
+        }
     }
 }
