@@ -6,11 +6,9 @@ import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
 import org.digitalpower.model.WebData;
 
 import java.io.IOException;
-import java.io.Serial;
 
 public class WebDataDeserializerSchema extends AbstractDeserializationSchema<WebData> {
 
-    @Serial
     private static final long serialVersionUID = 1L;
     private transient ObjectMapper objectMapper;
 

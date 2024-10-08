@@ -6,6 +6,7 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+
 import org.digitalpower.deserializer.WebDataDeserializerSchema;
 import org.digitalpower.model.WebData;
 
@@ -23,21 +24,27 @@ public class DataStreamJob {
             // Create the Kafka source
             KafkaSource<WebData> webDataSource = KafkaSource.<WebData>builder()
                     .setBootstrapServers(BOOTSTRAP_SERVER)
-                    .setTopics("web-data")
+                    .setTopics("webdata")
                     .setGroupId("test-group")
                     .setStartingOffsets(OffsetsInitializer.earliest())
                     .setValueOnlyDeserializer(new WebDataDeserializerSchema())
                     .build();
 
+            // Create the data stream from the Kafka sources
+            DataStream<WebData> webDataStream = env.fromSource(webDataSource, WatermarkStrategy.noWatermarks(), "webdata");
 
-            // Create the data streams from the Kafka sources
-            DataStream<WebData> webDataStream = env.fromSource(webDataSource, WatermarkStrategy.noWatermarks(), "WebData source");
+            // Apply the HighPropensityDetector process function
+            DataStream<String> highPropensityBuyers = webDataStream
+                    .keyBy(WebData::getUserId)
+                    .process(new HighPropensityBuyerDetector())
+                    .name("high-propensity-detector");
+
 
             // Print the stream to the console
-            webDataStream.print();
+            highPropensityBuyers.print();
 
             // Execute the job
-            env.execute("Process user and web data");
+            env.execute("Webdata - High propensity buyers");
 
         }
     }

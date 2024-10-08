@@ -7,7 +7,7 @@ public class WebData {
     public String userId;
     public String sessionId;
     public long timestamp;
-    public int sessionDuration;
+    public int sessionDurationSeconds;
     public ArrayList<PageView> pageViews;
     public CartActivity cartActivity;
 
@@ -15,11 +15,11 @@ public class WebData {
     public WebData() {
     }
 
-    public WebData(String userId, String sessionId, long timestamp, int sessionDuration, ArrayList<PageView> pageViews, CartActivity cartActivity) {
+    public WebData(String userId, String sessionId, long timestamp, int sessionDurationSeconds, ArrayList<PageView> pageViews, CartActivity cartActivity) {
         this.userId = userId;
         this.sessionId = sessionId;
         this.timestamp = timestamp;
-        this.sessionDuration = sessionDuration;
+        this.sessionDurationSeconds = sessionDurationSeconds;
         this.pageViews = pageViews;
         this.cartActivity = cartActivity;
     }
@@ -30,10 +30,14 @@ public class WebData {
                 ", userId='" + userId + '\'' +
                 ", sessionId='" + sessionId + '\'' +
                 ", timestamp=" + timestamp +
-                ", sessionDuration=" + sessionDuration +
+                ", sessionDurationSeconds=" + sessionDurationSeconds +
                 ", pageViews=" + pageViews +
                 ", cartActivity=" + cartActivity +
                 '}';
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public static class PageView {
