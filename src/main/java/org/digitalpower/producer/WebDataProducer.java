@@ -1,17 +1,13 @@
 package org.digitalpower.producer;
 
 import com.github.javafaker.Faker;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.digitalpower.model.WebData;
 
 import java.util.*;
 
 public class WebDataProducer {
 
-    private static final String WEBDATA_TOPIC = "webdata";
     private final Faker faker;
-    private final KafkaProducer<String, WebData> producer;
     private final List<String> pagePaths;
     private final Random random;
     private final Set<String> userIds;
@@ -19,7 +15,6 @@ public class WebDataProducer {
     // Constructor
     public WebDataProducer(long seed, int numberOfUsers) {
         this.faker = new Faker(new Random(seed));
-        this.producer = KafkaProducerConfig.createWebDataProducer();
         this.pagePaths = Arrays.asList(
                 "/cart",
                 "/home",
@@ -31,27 +26,6 @@ public class WebDataProducer {
         );
         this.random = new Random();
         this.userIds = generateUserIds(numberOfUsers);
-    }
-
-    // Main method
-    public static void main(String[] args) {
-
-        long seed = 12345L;
-        int numberOfUsers = 5;
-        int numberOfEvents = 50;
-
-        // Create a new instance of the WebDataProducer class
-        WebDataProducer webDataProducer = new WebDataProducer(seed, numberOfUsers);
-
-        // Generate a new WebData object
-        for (int i = 0; i < numberOfEvents; i++) {
-            WebData webData = webDataProducer.generateWebData();
-            System.out.println(webData.toString());
-
-            // Send the generated webdata to Kafka
-            webDataProducer.sendToKafka(webData);
-        }
-
     }
 
     private Set<String> generateUserIds(int numberOfUsers) {
@@ -101,10 +75,5 @@ public class WebDataProducer {
             itemsAdded.add(itemAdded);
         }
         return itemsAdded;
-    }
-
-    public void sendToKafka(WebData webData) {
-        producer.send(new ProducerRecord<>(WEBDATA_TOPIC, webData.userId, webData));
-        producer.flush();
     }
 }

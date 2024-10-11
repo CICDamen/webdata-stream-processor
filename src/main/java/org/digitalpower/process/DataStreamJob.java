@@ -39,9 +39,9 @@ public class DataStreamJob {
                     .process(new HighPropensityBuyerDetector())
                     .name("high-propensity-detector");
 
-
-            // Print the stream to the console
             highPropensityBuyers.print();
+
+            // TODO: add sink to write to MongoDB
 
             // Execute the job
             env.execute("Webdata - High propensity buyers");
