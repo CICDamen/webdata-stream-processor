@@ -1,8 +1,8 @@
-package org.digitalpower.model;
+package org.digitalpower.common;
 
-import org.digitalpower.model.WebData.CartActivity;
-import org.digitalpower.model.WebData.ItemAdded;
-import org.digitalpower.model.WebData.PageView;
+import org.digitalpower.common.WebData.CartActivity;
+import org.digitalpower.common.WebData.ItemAdded;
+import org.digitalpower.common.WebData.PageView;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -26,10 +26,10 @@ public class WebDataTest {
 
         assertNotNull(webData);
         assertEquals("user123", webData.getUserId());
-        assertEquals("session456", webData.sessionId);
-        assertEquals(1627849923000L, webData.timestamp);
-        assertEquals(3600, webData.sessionDurationSeconds);
-        assertEquals(pageViews, webData.pageViews);
-        assertEquals(cartActivity, webData.cartActivity);
+        assertEquals("session456", webData.getSessionId());
+        assertEquals(1627849923000L, webData.getTimestamp());
+        assertEquals(3600, webData.getSessionDurationSeconds());
+        assertEquals(pageViews, webData.getPageViews());
+        assertEquals(cartActivity, webData.getCartActivity());
     }
 }

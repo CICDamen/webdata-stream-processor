@@ -1,6 +1,6 @@
 package org.digitalpower.process;
 
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 import org.digitalpower.producer.WebDataProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,12 +24,12 @@ public class WebDataProducerTest {
         WebData webData = webDataProducer.generateWebData();
         assertNotNull(webData);
         assertNotNull(webData.getUserId());
-        assertNotNull(webData.sessionId);
-        assertTrue(webData.timestamp > 0);
-        assertTrue(webData.sessionDurationSeconds > 0);
-        assertNotNull(webData.pageViews);
-        assertNotNull(webData.cartActivity);
-        assertNotNull(webData.cartActivity.itemsAdded);
+        assertNotNull(webData.getSessionId());
+        assertTrue(webData.getTimestamp() > 0);
+        assertTrue(webData.getSessionDurationSeconds() > 0);
+        assertNotNull(webData.getPageViews());
+        assertNotNull(webData.getCartActivity());
+        assertNotNull(webData.getCartActivity().getItemsAdded());
     }
 
 }

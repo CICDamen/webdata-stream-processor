@@ -3,7 +3,7 @@ package org.digitalpower.producer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 import org.digitalpower.serializer.WebDataSerializer;
 
 import java.util.Properties;

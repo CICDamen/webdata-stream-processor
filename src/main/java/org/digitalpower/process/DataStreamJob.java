@@ -8,7 +8,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import org.digitalpower.deserializer.WebDataDeserializerSchema;
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 
 public class DataStreamJob {
 
@@ -34,14 +34,18 @@ public class DataStreamJob {
             DataStream<WebData> webDataStream = env.fromSource(webDataSource, WatermarkStrategy.noWatermarks(), "webdata");
 
             // Apply the HighPropensityDetector process function
-            DataStream<String> highPropensityBuyers = webDataStream
+            DataStream<HighPropensityBuyer> highPropensityBuyers = webDataStream
                     .keyBy(WebData::getUserId)
                     .process(new HighPropensityBuyerDetector())
                     .name("high-propensity-detector");
 
             highPropensityBuyers.print();
 
-            // TODO: add sink to write to MongoDB
+            // TO DO:
+            // - Kafka sink
+            // - Combine with other data streams
+            // - Use mapping from database
+
 
             // Execute the job
             env.execute("Webdata - High propensity buyers");

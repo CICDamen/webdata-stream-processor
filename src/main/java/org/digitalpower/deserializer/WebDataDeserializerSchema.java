@@ -3,7 +3,7 @@ package org.digitalpower.deserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 
 import java.io.IOException;
 

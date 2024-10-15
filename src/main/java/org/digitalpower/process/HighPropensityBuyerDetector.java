@@ -9,7 +9,7 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -17,7 +17,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HighPropensityBuyerDetector extends KeyedProcessFunction<String, WebData, String> {
+public class HighPropensityBuyerDetector extends KeyedProcessFunction<String, WebData, HighPropensityBuyer> {
 
     private static final long serialVersionUID = 1L;
 
@@ -71,24 +71,23 @@ public class HighPropensityBuyerDetector extends KeyedProcessFunction<String, We
     }
 
     @Override
-    public void processElement(WebData webData, Context context, Collector<String> collector) throws Exception {
+    public void processElement(WebData webData, Context context, Collector<HighPropensityBuyer> collector) throws Exception {
         long thirtyDaysAgo = System.currentTimeMillis() - THIRTY_DAYS;
         long sevenDaysAgo = System.currentTimeMillis() - SEVEN_DAYS;
 
         // Count the number of page views in the last 30 days
-        long visitCount = webData.pageViews.stream()
-                .filter(pageView -> pageView.timestamp > thirtyDaysAgo)
+        long visitCount = webData.getPageViews().stream()
+                .filter(pageView -> pageView.getTimestamp() > thirtyDaysAgo)
                 .count();
-        System.out.println("Visit count: " + visitCount);
 
         // Add session duration and calculate the average session duration
-        avgSessionDurationState.add((long) webData.sessionDurationSeconds);
+        avgSessionDurationState.add((long) webData.getSessionDurationSeconds());
         double avgSessionDuration = avgSessionDurationState.get();
 
 
         // Count the number of items added to the cart in the last 7 days
-        long cartCount = webData.cartActivity.itemsAdded.stream()
-                .filter(itemAdded -> itemAdded.timestamp > sevenDaysAgo)
+        long cartCount = webData.getCartActivity().getItemsAdded().stream()
+                .filter(itemAdded -> itemAdded.getTimestamp()> sevenDaysAgo)
                 .count();
 
         // Add the current webdata event
@@ -99,7 +98,7 @@ public class HighPropensityBuyerDetector extends KeyedProcessFunction<String, We
         List<WebData> recentWebDataEvents = new ArrayList<>();
         for (WebData recentWebData : recentWebDataState.get()) {
             recentWebDataEvents.add(recentWebData);
-            if (recentWebData.pageViews.stream().anyMatch(pageView -> pageView.pageUrl.equals("/checkout"))) {
+            if (recentWebData.getPageViews().stream().anyMatch(pageView -> pageView.getPageUrl().equals("/checkout"))) {
                 visitedCheckout = true;
                 break;
             }
@@ -113,20 +112,11 @@ public class HighPropensityBuyerDetector extends KeyedProcessFunction<String, We
 
         boolean isHighPropensity = visitCount >= 5 && avgSessionDuration > 5 * 60 && cartCount >= 1 && visitedCheckout;
 
-        String logMessage = "Not a high propensity buyer";
-
-        // Log the user details if high propensity
+        // Return the user ID and the calculated metrics
         if (isHighPropensity) {
-            logMessage = "High propensity buyer detected!\n" +
-                    "User ID: " + webData.userId + "\n" +
-                    "Session ID: " + webData.sessionId + "\n" +
-                    "Visit Count: " + visitCount + "\n" +
-                    "Average Session Duration: " + avgSessionDuration + "\n" +
-                    "Cart Count: " + cartCount;
+            collector.collect(new HighPropensityBuyer(webData.getUserId(), visitCount, cartCount, avgSessionDuration));
         }
 
-        // Collect the log message
-        collector.collect("Processed session: " + webData.sessionId + " for user: " + webData.userId + " - " + logMessage);
-
     }
+
 }

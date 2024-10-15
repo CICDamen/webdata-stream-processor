@@ -1,7 +1,7 @@
 package org.digitalpower.producer;
 
 import com.github.javafaker.Faker;
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 
 import java.util.*;
 
@@ -38,13 +38,13 @@ public class WebDataProducer {
 
     public WebData generateWebData() {
         WebData webData = new WebData();
-        webData.userId = getRandomUserId();
-        webData.sessionId = faker.idNumber().valid();
-        webData.timestamp = System.currentTimeMillis();
-        webData.sessionDurationSeconds = faker.number().numberBetween(1, 1000);
-        webData.pageViews = generatePageViews(faker.number().numberBetween(1, 10));
-        webData.cartActivity = new WebData.CartActivity();
-        webData.cartActivity.itemsAdded = generateItemsAdded(faker.number().numberBetween(1, 10));
+        webData.setUserId(getRandomUserId());
+        webData.setSessionId(faker.idNumber().valid());
+        webData.setTimestamp(System.currentTimeMillis());
+        webData.setSessionDurationSeconds(faker.number().numberBetween(1, 1000));
+        webData.setPageViews(generatePageViews(faker.number().numberBetween(1, 10)));
+        webData.setCartActivity(new WebData.CartActivity());
+        webData.getCartActivity().setItemsAdded(generateItemsAdded(faker.number().numberBetween(1, 10)));
         return webData;
     }
 
@@ -53,25 +53,25 @@ public class WebDataProducer {
         return userIds.toArray(new String[0])[index];
     }
 
-    private ArrayList<WebData.PageView> generatePageViews(int numPageViews) {
-        ArrayList<WebData.PageView> pageViews = new ArrayList<>();
+    private List<WebData.PageView> generatePageViews(int numPageViews) {
+        List<WebData.PageView> pageViews = new ArrayList<>();
         for (int i = 0; i < numPageViews; i++) {
             WebData.PageView pageView = new WebData.PageView();
-            pageView.pageUrl = pagePaths.get(random.nextInt(pagePaths.size()));
-            pageView.timestamp = System.currentTimeMillis();
+            pageView.setPageUrl(pagePaths.get(random.nextInt(pagePaths.size())));
+            pageView.setTimestamp(System.currentTimeMillis());
             pageViews.add(pageView);
         }
         return pageViews;
     }
 
-    private ArrayList<WebData.ItemAdded> generateItemsAdded(int numItemsAdded) {
-        ArrayList<WebData.ItemAdded> itemsAdded = new ArrayList<>();
+    private List<WebData.ItemAdded> generateItemsAdded(int numItemsAdded) {
+        List<WebData.ItemAdded> itemsAdded = new ArrayList<>();
 
         for (int i = 0; i < numItemsAdded; i++) {
             WebData.ItemAdded itemAdded = new WebData.ItemAdded();
-            itemAdded.timestamp = System.currentTimeMillis();
-            itemAdded.productId = faker.idNumber().valid();
-            itemAdded.quantity = faker.number().numberBetween(1, 10);
+            itemAdded.setTimestamp(System.currentTimeMillis());
+            itemAdded.setProductId(faker.idNumber().valid());
+            itemAdded.setQuantity(faker.number().numberBetween(1, 10));
             itemsAdded.add(itemAdded);
         }
         return itemsAdded;

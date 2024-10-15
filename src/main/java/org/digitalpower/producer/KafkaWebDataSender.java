@@ -2,7 +2,7 @@ package org.digitalpower.producer;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ public class KafkaWebDataSender {
     // Method to send WebData to Kafka
     public void sendToKafka(WebData webData) {
         logger.info("Sending WebData event to Kafka: {}", webData);
-        producer.send(new ProducerRecord<>(WEBDATA_TOPIC, webData.userId, webData), (metadata, exception) -> {
+        producer.send(new ProducerRecord<>(WEBDATA_TOPIC, webData.getUserId(), webData), (metadata, exception) -> {
             if (exception != null) {
                 logger.error("Error sending WebData to Kafka", exception);
             } else {

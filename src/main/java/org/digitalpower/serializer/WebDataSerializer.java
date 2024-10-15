@@ -2,7 +2,7 @@ package org.digitalpower.serializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.serialization.Serializer;
-import org.digitalpower.model.WebData;
+import org.digitalpower.common.WebData;
 
 import java.util.Map;
 
