@@ -1,11 +1,11 @@
-package org.digitalpower.serializer;
+package org.digitalpower.serialize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.serialization.Serializer;
-import org.digitalpower.common.WebData;
-import org.digitalpower.common.WebData.CartActivity;
-import org.digitalpower.common.WebData.ItemAdded;
-import org.digitalpower.common.WebData.PageView;
+import org.digitalpower.models.WebData;
+import org.digitalpower.models.WebData.CartActivity;
+import org.digitalpower.models.WebData.ItemAdded;
+import org.digitalpower.models.WebData.PageView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

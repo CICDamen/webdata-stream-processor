@@ -1,8 +1,8 @@
-package org.digitalpower.common;
+package org.digitalpower.models;
 
-import org.digitalpower.common.WebData.CartActivity;
-import org.digitalpower.common.WebData.ItemAdded;
-import org.digitalpower.common.WebData.PageView;
+import org.digitalpower.models.WebData.CartActivity;
+import org.digitalpower.models.WebData.ItemAdded;
+import org.digitalpower.models.WebData.PageView;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

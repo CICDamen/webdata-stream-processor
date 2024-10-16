@@ -9,7 +9,8 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import org.digitalpower.common.WebData;
+import org.digitalpower.models.HighPropensityBuyer;
+import org.digitalpower.models.WebData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -93,7 +94,7 @@ public class HighPropensityBuyerDetector extends KeyedProcessFunction<String, We
         // Add the current webdata event
         recentWebDataState.add(webData);
 
-        // Check if the user visited the /checkout page in the last X events
+        // Check if the user visited the /checkout page in the last 5 events
         boolean visitedCheckout = false;
         List<WebData> recentWebDataEvents = new ArrayList<>();
         for (WebData recentWebData : recentWebDataState.get()) {

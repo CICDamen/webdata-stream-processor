@@ -1,4 +1,4 @@
-package org.digitalpower.process;
+package org.digitalpower.models;
 
 public class HighPropensityBuyer {
 

@@ -1,7 +1,6 @@
-package org.digitalpower.process;
+package org.digitalpower.producer;
 
-import org.digitalpower.common.WebData;
-import org.digitalpower.producer.WebDataProducer;
+import org.digitalpower.models.WebData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

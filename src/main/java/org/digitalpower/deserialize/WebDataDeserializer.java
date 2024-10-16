@@ -1,13 +1,13 @@
-package org.digitalpower.deserializer;
+package org.digitalpower.deserialize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
-import org.digitalpower.common.WebData;
+import org.digitalpower.models.WebData;
 
 import java.io.IOException;
 
-public class WebDataDeserializerSchema extends AbstractDeserializationSchema<WebData> {
+public class WebDataDeserializer extends AbstractDeserializationSchema<WebData> {
 
     private static final long serialVersionUID = 1L;
     private transient ObjectMapper objectMapper;

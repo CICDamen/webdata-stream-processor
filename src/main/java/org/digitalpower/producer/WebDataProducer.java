@@ -1,7 +1,7 @@
 package org.digitalpower.producer;
 
 import com.github.javafaker.Faker;
-import org.digitalpower.common.WebData;
+import org.digitalpower.models.WebData;
 
 import java.util.*;
 

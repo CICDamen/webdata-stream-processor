@@ -1,4 +1,4 @@
-package org.digitalpower.common;
+package org.digitalpower.models;
 
 import java.util.List;
 
