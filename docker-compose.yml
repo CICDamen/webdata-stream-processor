@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.4
@@ -23,18 +21,47 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    depends_on:
+      - kafka
+    ports:
+      - "18080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+
   rest-proxy:
     image: confluentinc/cp-kafka-rest:7.5.0
     depends_on:
       - kafka
-    ports:
-      - 8082:8082
     hostname: rest-proxy
     container_name: rest-proxy
     environment:
       KAFKA_REST_HOST_NAME: rest-proxy
       KAFKA_REST_BOOTSTRAP_SERVERS: 'kafka:9092'
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+
+  jobmanager:
+    image: flink:1.18.1-scala_2.12-java11
+    ports:
+      - "18081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+
+  taskmanager:
+    image: flink:1.18.1-scala_2.12-java11
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
 
   # This service is used to create the topics in Kafka on startup
   init-kafka:
