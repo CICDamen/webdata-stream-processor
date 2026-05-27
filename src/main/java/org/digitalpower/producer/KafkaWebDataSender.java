@@ -7,6 +7,8 @@ import org.digitalpower.models.WebData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class KafkaWebDataSender {
 
     private static String KAFKA_BOOTSTRAP_SERVERS;
@@ -20,6 +22,8 @@ public class KafkaWebDataSender {
         // Parameters for event generation
         int numberOfUsers;
         int numberOfEvents;
+        boolean continuous;
+        long intervalMillis;
 
         // Parse command line arguments
         Options options = new Options();
@@ -27,6 +31,8 @@ public class KafkaWebDataSender {
         options.addOption("t", "kafka.topic", true, "Kafka topic");
         options.addOption("u", "number-of-users", true, "Number of users");
         options.addOption("e", "number-of-events", true, "Number of events");
+        options.addOption("c", "continuous", false, "Continuously emit events until stopped");
+        options.addOption("i", "interval-ms", true, "Delay in milliseconds between generated events");
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -35,6 +41,8 @@ public class KafkaWebDataSender {
             KAFKA_TOPIC = cmd.getOptionValue("t", "webdata");
             numberOfUsers = Integer.parseInt(cmd.getOptionValue("u", "5"));
             numberOfEvents = Integer.parseInt(cmd.getOptionValue("e", "50"));
+            continuous = cmd.hasOption("c");
+            intervalMillis = Long.parseLong(cmd.getOptionValue("i", "1000"));
         } catch (ParseException e) {
             logger.error("Error parsing command line arguments", e);
             throw new RuntimeException("Error parsing command line arguments", e);
@@ -44,7 +52,11 @@ public class KafkaWebDataSender {
         KafkaWebDataSender kafkaWebDataSender = new KafkaWebDataSender();
 
         // Push events to Kafka
-        kafkaWebDataSender.pushEventsToKafka(12345L, numberOfUsers, numberOfEvents);
+        if (continuous) {
+            kafkaWebDataSender.pushEventsToKafkaContinuously(12345L, numberOfUsers, intervalMillis);
+        } else {
+            kafkaWebDataSender.pushEventsToKafka(12345L, numberOfUsers, numberOfEvents);
+        }
     }
 
     // Constructor to initialize KafkaProducer
@@ -59,6 +71,34 @@ public class KafkaWebDataSender {
         for (int i = 0; i < numberOfEvents; i++) {
             WebData webData = webDataProducer.generateWebData();
             send(webData);
+        }
+    }
+
+    // Method to keep pushing events until the process is stopped
+    public void pushEventsToKafkaContinuously(long seed, int numberOfUsers, long intervalMillis) {
+        WebDataProducer webDataProducer = new WebDataProducer(seed, numberOfUsers);
+        AtomicBoolean running = new AtomicBoolean(true);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            running.set(false);
+            producer.close();
+            logger.info("Stopped continuous WebData event production");
+        }));
+
+        logger.info("Starting continuous WebData event production every {} ms", intervalMillis);
+        while (running.get()) {
+            WebData webData = webDataProducer.generateWebData();
+            send(webData);
+            sleep(intervalMillis);
+        }
+    }
+
+    private void sleep(long intervalMillis) {
+        try {
+            Thread.sleep(intervalMillis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Continuous event production interrupted", e);
         }
     }
 

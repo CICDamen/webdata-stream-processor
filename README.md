@@ -10,6 +10,28 @@ This project implements a streaming data pipeline that processes web activity da
 2. **Stream Processing Layer**: Processes the data using Apache Flink
 3. **Output Layer**: Produces high propensity buyer events
 
+### Stream Flow
+
+```mermaid
+flowchart LR
+    producer["WebDataProducer<br/>Generate synthetic web activity"]
+    sender["KafkaWebDataSender<br/>Serialize and publish events"]
+    inputTopic[("Kafka topic<br/>webdata")]
+    source["Flink KafkaSource<br/>WebDataDeserializer"]
+    keyBy["Key stream by userId"]
+    detector["HighPropensityBuyerDetector<br/>Evaluate behavioral signals"]
+    state[("Flink keyed state<br/>Recent events<br/>Average session duration")]
+    filter{"High propensity buyer?"}
+    sink["Flink KafkaSink<br/>HighPropensityBuyerSerializationSchema"]
+    outputTopic[("Kafka topic<br/>high-propensity-buyers")]
+
+    producer --> sender --> inputTopic --> source --> keyBy --> detector
+    detector <--> state
+    detector --> filter
+    filter -- "yes" --> sink --> outputTopic
+    filter -- "no" --> drop["No output event"]
+```
+
 ### Component Details
 
 #### Producer Components
@@ -41,27 +63,66 @@ This project implements a streaming data pipeline that processes web activity da
 git clone [repository-url]
 ```
 
-2. Build the project:
+2. Install Maven if needed:
+```bash
+brew install maven
+```
+
+3. Build the project:
 ```bash
 mvn clean package
 ```
 
-3. Start the environment:
+4. Start the environment:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-## Running the Application
+## Demo
 
-1. Start the Kafka producer:
+### Run with the Flink Dashboard
+
+The Docker Compose environment includes Kafka, Kafka UI, the Kafka REST Proxy, and a Flink cluster.
+
+Open these dashboards after starting the environment:
+
+- Kafka UI: [http://localhost:18080](http://localhost:18080)
+- Flink Dashboard: [http://localhost:18081](http://localhost:18081)
+
+Submit the stream processor to Flink:
+
 ```bash
-java -cp target/[jar-name].jar org.digitalpower.producer.WebDataProducer
+docker compose cp target/webdata-stream-processor-1.0-SNAPSHOT.jar jobmanager:/opt/flink/app.jar
+
+docker compose exec jobmanager flink run /opt/flink/app.jar \
+  --kafka.bootstrap.servers kafka:9092 \
+  --kafka.topic.input webdata \
+  --kafka.topic.output high-propensity-buyers
 ```
 
-2. Start the Flink job:
+Generate demo web activity events continuously from your local machine:
+
 ```bash
-java -cp target/[jar-name].jar org.digitalpower.process.DataStreamJob
+f
 ```
+
+Use `Ctrl+C` to stop the producer. To emit a fixed number of events instead, replace `--continuous --interval-ms 1000` with `--number-of-events 100`.
+
+Inspect messages in Kafka UI:
+
+- Open the `webdata` topic to see incoming generated events.
+- Open the `high-propensity-buyers` topic to see users emitted by the Flink detector.
+
+You can also watch the output topic from the terminal:
+
+```bash
+docker compose exec kafka kafka-console-consumer \
+  --bootstrap-server kafka:9092 \
+  --topic high-propensity-buyers \
+  --from-beginning
+```
+
+Use `kafka:9092` for commands running inside Docker containers, such as the Flink job. Use `localhost:29092` for commands running directly on your machine, such as the demo event producer. Start the stream processor with `flink run` in the JobManager container because the Flink runtime provides dependencies that are not bundled for direct `java -cp` execution.
 
 ## Testing
 
@@ -73,7 +134,7 @@ mvn test
 ## Configuration
 
 Key configuration files:
-- `docker-compose.yml`: Contains service configurations for Kafka and Zookeeper
+- `docker-compose.yml`: Contains service configurations for Kafka, Zookeeper, Kafka UI, Kafka REST Proxy, and Flink
 - `src/main/resources/log4j2.properties`: Logging configuration
 
 ## Project Structure
@@ -90,4 +151,3 @@ Key configuration files:
 ├── docker-compose.yml       # Docker services configuration
 └── pom.xml                 # Maven configuration
 ```
-

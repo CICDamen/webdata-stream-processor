@@ -30,6 +30,8 @@ under the License.
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<flink.version>1.18.1</flink.version>
+		<testcontainers.version>2.0.4</testcontainers.version>
+		<commons-compress.version>1.26.1</commons-compress.version>
 		<target.java.version>1.8</target.java.version>
 		<scala.binary.version>2.12</scala.binary.version>
 		<maven.compiler.source>${target.java.version}</maven.compiler.source>
@@ -150,8 +152,14 @@ under the License.
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>kafka</artifactId>
-			<version>1.20.2</version>
+			<artifactId>testcontainers-kafka</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>${commons-compress.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -196,8 +204,6 @@ under the License.
 								<excludes>
 									<exclude>org.apache.flink:flink-shaded-force-shading</exclude>
 									<exclude>com.google.code.findbugs:jsr305</exclude>
-									<exclude>org.slf4j:*</exclude>
-									<exclude>org.apache.logging.log4j:*</exclude>
 								</excludes>
 							</artifactSet>
 							<filters>
