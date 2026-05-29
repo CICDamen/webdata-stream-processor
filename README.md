@@ -52,7 +52,7 @@ flowchart LR
 ## Getting Started
 
 ### Prerequisites
-- Java 11 or higher
+- Java 17 or higher
 - Apache Maven
 - Docker and Docker Compose
 
@@ -103,7 +103,13 @@ docker compose exec jobmanager flink run /opt/flink/app.jar \
 Generate demo web activity events continuously from your local machine:
 
 ```bash
-f
+java -cp target/webdata-stream-processor-1.0-SNAPSHOT.jar \
+  org.digitalpower.producer.KafkaWebDataSender \
+  --kafka.bootstrap.servers localhost:29092 \
+  --kafka.topic webdata \
+  --number-of-users 5 \
+  --continuous \
+  --interval-ms 1000
 ```
 
 Use `Ctrl+C` to stop the producer. To emit a fixed number of events instead, replace `--continuous --interval-ms 1000` with `--number-of-events 100`.
