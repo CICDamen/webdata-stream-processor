@@ -68,7 +68,7 @@ git clone [repository-url]
 brew install maven
 ```
 
-3. Build the project:
+3. Build the project (run from the project root, where `pom.xml` lives):
 ```bash
 mvn clean package
 ```
@@ -89,7 +89,7 @@ Open these dashboards after starting the environment:
 - Kafka UI: [http://localhost:18080](http://localhost:18080)
 - Flink Dashboard: [http://localhost:18081](http://localhost:18081)
 
-Submit the stream processor to Flink:
+Submit the stream processor to Flink (run from the project root):
 
 ```bash
 docker compose cp target/webdata-stream-processor-1.0-SNAPSHOT.jar jobmanager:/opt/flink/app.jar
@@ -100,7 +100,7 @@ docker compose exec jobmanager flink run /opt/flink/app.jar \
   --kafka.topic.output high-propensity-buyers
 ```
 
-Generate demo web activity events continuously from your local machine:
+Generate demo web activity events continuously from your local machine (run from the project root):
 
 ```bash
 java -cp target/webdata-stream-processor-1.0-SNAPSHOT.jar \
